@@ -93,6 +93,99 @@
          (list (lambda () nil) (lambda () t) (lambda () nil))))
     (should (keypad--pass-through-p))))
 
+;;; -mode suffix predicates
+
+(ert-deftest keypad-tt-pass-through--mode-suffix-major ()
+  "Symbol ending with -mode matching major-mode returns t."
+  (let ((keypad-pass-through-predicates '(keypad-tt-pt-major-mode))
+        (major-mode 'keypad-tt-pt-major-mode))
+    (defun keypad-tt-pt-major-mode () (interactive) t)
+    (unwind-protect
+        (should (keypad--pass-through-p))
+      (fmakunbound 'keypad-tt-pt-major-mode))))
+
+(ert-deftest keypad-tt-pass-through--mode-suffix-major-wins-over-nil-var ()
+  "Major-mode match takes priority over bound-and-true-p, even when var is nil."
+  (let ((keypad-pass-through-predicates '(keypad-tt-pt-majvar-mode))
+        (major-mode 'keypad-tt-pt-majvar-mode))
+    (defvar keypad-tt-pt-majvar-mode nil)
+    (defun keypad-tt-pt-majvar-mode () (interactive) t)
+    (unwind-protect
+        (should (keypad--pass-through-p))
+      (makunbound 'keypad-tt-pt-majvar-mode)
+      (fmakunbound 'keypad-tt-pt-majvar-mode))))
+
+(ert-deftest keypad-tt-pass-through--mode-suffix-minor-active ()
+  "Symbol ending with -mode: minor-mode enabled via bound-and-true-p."
+  (let ((keypad-pass-through-predicates '(keypad-tt-pt-minor-mode))
+        (major-mode 'fundamental-mode))
+    (defvar keypad-tt-pt-minor-mode t)
+    (unwind-protect
+        (should (keypad--pass-through-p))
+      (makunbound 'keypad-tt-pt-minor-mode))))
+
+(ert-deftest keypad-tt-pass-through--mode-suffix-minor-inactive ()
+  "Symbol ending with -mode: minor-mode disabled (bound nil)."
+  (let ((keypad-pass-through-predicates '(keypad-tt-pt-minor-mode))
+        (major-mode 'fundamental-mode))
+    (defvar keypad-tt-pt-minor-mode nil)
+    (unwind-protect
+        (should-not (keypad--pass-through-p))
+      (makunbound 'keypad-tt-pt-minor-mode))))
+
+(ert-deftest keypad-tt-pass-through--mode-suffix-unbound-no-major ()
+  "Symbol ending with -mode, unbound, not matching major-mode -> nil."
+  (let ((keypad-pass-through-predicates '(keypad-tt-pt-nobound-mode))
+        (major-mode 'fundamental-mode))
+    (should-not (keypad--pass-through-p))))
+
+(ert-deftest keypad-tt-pass-through--mode-suffix-command-not-called ()
+  "Symbol ending with -mode that is a command: not funcall'd even if fbound."
+  (let ((keypad-pass-through-predicates '(keypad-tt-pt-cmd-mode))
+        (major-mode 'fundamental-mode))
+    (defun keypad-tt-pt-cmd-mode () (interactive) t)
+    (unwind-protect
+        (should-not (keypad--pass-through-p))
+      (fmakunbound 'keypad-tt-pt-cmd-mode))))
+
+(ert-deftest keypad-tt-pass-through--mode-suffix-noncommand-not-called ()
+  "Symbol ending with -mode, non-command, fbound: NOT funcall'd."
+  (let ((keypad-pass-through-predicates '(keypad-tt-pt-fnmode-mode))
+        (major-mode 'fundamental-mode))
+    (defun keypad-tt-pt-fnmode-mode () t)
+    (unwind-protect
+        (should-not (keypad--pass-through-p))
+      (fmakunbound 'keypad-tt-pt-fnmode-mode))))
+
+(ert-deftest keypad-tt-pass-through--mode-suffix-combined-active ()
+  "Combined predicates: -mode active plus nil lambda -> pass-through."
+  (let ((keypad-pass-through-predicates
+         (list 'keypad-tt-pt-combo-mode (lambda () nil)))
+        (major-mode 'fundamental-mode))
+    (defvar keypad-tt-pt-combo-mode t)
+    (unwind-protect
+        (should (keypad--pass-through-p))
+      (makunbound 'keypad-tt-pt-combo-mode))))
+
+(ert-deftest keypad-tt-pass-through--mode-suffix-combined-all-nil ()
+  "Combined predicates: all nil -> no pass-through."
+  (let ((keypad-pass-through-predicates
+         (list 'keypad-tt-pt-nil-mode (lambda () nil)))
+        (major-mode 'fundamental-mode))
+    (defvar keypad-tt-pt-nil-mode nil)
+    (unwind-protect
+        (should-not (keypad--pass-through-p))
+      (makunbound 'keypad-tt-pt-nil-mode))))
+
+(ert-deftest keypad-tt-pass-through--predicates-override ()
+  "Explicit PREDICATES arg overrides `keypad-pass-through-predicates'."
+  (let ((keypad-pass-through-predicates '(minibufferp))
+        (major-mode 'fundamental-mode))
+    (should (keypad--pass-through-p (list (lambda () t)))))
+  (let ((keypad-pass-through-predicates (list (lambda () t)))
+        (major-mode 'fundamental-mode))
+    (should-not (keypad--pass-through-p (list (lambda () nil))))))
+
 
 ;;; Normalization
 
