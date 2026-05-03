@@ -204,9 +204,8 @@ modifier-prefix contexts.  Respects `which-key-idle-delay`, supports C-h n/p.
 
 | Key | Behavior |
 |-----|----------|
-| `SPC f` | `C-c C-f` — modifier=C- (empty string normalized to nil, tried plain `C-c f` first, fallback to `C-c C-f` since bound) |
-| `SPC f` (C-c C-f unbound) | `C-c f` — modifier="" → plain first, fallback unbound too → plain returned |
-| `SPC SPC f` | `C-c f` — toggle modifier off (from nil → `C-`), then `C-c f` (plain) |
+| `SPC f` | `C-c f` — modifier="" (empty string normalized to nil, tried plain `C-c f` first, fallback to `C-c C-f` since bound) |
+| `SPC SPC f` | `C-c C-f` — toggle modifier on (from nil → `C-`), then `C-c f` (plain) |
 | `SPC x f` | `C-x C-f` — dispatch `?x` to prefix `C-x`, modifier=C- |
 | `SPC h k` | `C-h k` — dispatch `?h` to prefix `C-h`, modifier=nil (plain first) |
 | `SPC s f` | `M-s f` — dispatch `?s` to prefix `M-s`, modifier=nil, fallback=M-. Auto-added M- since plain `f` has no binding |
@@ -215,7 +214,6 @@ modifier-prefix contexts.  Respects `which-key-idle-delay`, supports C-h n/p.
 | `SPC g g` | `M-g M-g` — dispatch `?g` to prefix `M-g`, modifier=nil, fallback=M- |
 | `SPC m x` | `M-x` — modifier-prefix `?m` (global M-), read second key |
 | `, f` | `M-f` — `,` is leader with modifier=M- |
-| `, SPC f` | `M-f` — toggle (M- → nil), plain `f` |
 | `. a` | `C-M-a` — `.` is leader with modifier=C-M- |
 | `.` in vc-dir | `.` — per-key pass-through to literal `.` in vc-dir buffers |
 
@@ -241,7 +239,7 @@ Toggle on/off via `keypad-mode`.
 
 (nconc keypad-keys
        `((:key "x" :prefix "C-x" :modifier "C-"   :fallback "C-")
-         (:key "c" :prefix "C-c" :modifier "C-"   :fallback "C-")
+         (:key "c" :prefix "C-c" :modifier nil    :fallback "C-")
          (:key "h" :prefix "C-h" :modifier nil    :fallback "C-")
          (:key "g" :prefix nil   :modifier "M-"   :fallback nil)
          (:key "G" :prefix nil   :modifier "C-M-" :fallback nil)))
@@ -254,11 +252,10 @@ Toggle on/off via `keypad-mode`.
 | Keys | Result | Mechanism |
 |------|--------|-----------|
 | `x f` | `C-x C-f` | prefix leader |
-| `c f` | `C-c C-f` | prefix leader |
+| `c f` | `C-c f` | prefix leader |
 | `h k` | `C-h k` | prefix leader, plain-first |
 | `a`–`z` (*except above*) | `C-<letter>` | `:self t`, key itself translated |
 | `g f` | `M-f` | modifier-prefix leader |
 | `G f` | `C-M-f` | modifier-prefix leader |
 
 Use `C-z` to toggle `keypad-mode` on/off.
-In `minibuffer` / `isearch-mode`, all keys pass through as normal text.
