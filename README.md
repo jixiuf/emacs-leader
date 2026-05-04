@@ -7,26 +7,6 @@ Emacs key sequences, so you can type `SPC f` instead of `C-c C-f`.
 Unlike most leader-key packages that bind commands under custom keymaps,
 keypad translates keystrokes *before* they reach any keymap.  This means all
 your existing Emacs bindings work automatically — no manual rebinding needed.
-
-## Comparison with similar packages
-
-| | **keypad** | **evil-keypad** | **god-mode** |
-|---|---|---|---|
-| **Mechanism** | `key-translation-map` translation | custom keymap + overlay parsing | minor-mode, overrides `self-insert` |
-| **Activation** | press leader key (SPC) | press trigger (SPC) in evil normal/visual/emacs states | ESC toggles, buffer-level switch |
-| **Modifier model** | per-leader config: prefix + modifier + fallback | fixed rules: first key `x`→C-x, `c`→C-c, `h`→C-h | all keys default to Ctrl; SPC→literal; `g`→M; `G`→C-M |
-| **Prefix switching** | dispatch alist maps any char to any prefix | `x`/`c`/`h` fixed to C-x/C-c/C-h | none — global Ctrl-only |
-| **Smart fallback** | Mod+char → unbound? fall back to plain char | Ctrl unbound → try literal | no fallback |
-| **Continuation** | follow prefix keymap, keep reading keys | Ctrl-persistent concept | always Ctrl |
-| **Multi-leader** | yes — multiple leader keys, each with own prefix | single trigger | single global mode |
-| **Toggle** | press leader key itself to toggle modifier | none | ESC exits god-mode |
-| **Pass-through** | predicate-based per-key pass-through | exit keypad to restore | exit god-mode to restore |
-| **Dependencies** | none | evil (can be used standalone) | none |
-| **which-key** | optional module `keypad-which-key` | deep integration | not applicable |
-| **Prefix args** | not supported | `u`→C-u, `-`→M--, digits | `u`→C-u, digits |
-| **Learning curve** | moderate (prefix/modifier/fallback/toggle) | low (fixed rules, intuitive) | low (all letters gain Ctrl) |
-| **Maturity** | 0.2.0 | 36 commits | 955 stars, established |
-
 ## Quick Start
 
 ```elisp
@@ -259,3 +239,23 @@ Toggle on/off via `keypad-mode`.
 | `G f` | `C-M-f` | modifier-prefix leader |
 
 Use `C-z` to toggle `keypad-mode` on/off.
+
+## Comparison with similar packages
+
+| | **keypad** | **evil-keypad** | **god-mode** |
+|---|---|---|---|
+| **Mechanism** | `key-translation-map` translation | custom keymap + overlay parsing | minor-mode, overrides `self-insert` |
+| **Activation** | press leader key (SPC) | press trigger (SPC) in evil normal/visual/emacs states | ESC toggles, buffer-level switch |
+| **Modifier model** | per-leader config: prefix + modifier + fallback | fixed rules: first key `x`→C-x, `c`→C-c, `h`→C-h | all keys default to Ctrl; SPC→literal; `g`→M; `G`→C-M |
+| **Prefix switching** | dispatch alist maps any char to any prefix | `x`/`c`/`h` fixed to C-x/C-c/C-h | none — global Ctrl-only |
+| **Smart fallback** | Mod+char → unbound? fall back to plain char | Ctrl unbound → try literal | no fallback |
+| **Continuation** | follow prefix keymap, keep reading keys | Ctrl-persistent concept | always Ctrl |
+| **Multi-leader** | yes — multiple leader keys, each with own prefix | single trigger | single global mode |
+| **Toggle** | press leader key itself to toggle modifier | none | ESC exits god-mode |
+| **Pass-through** | predicate-based per-key pass-through | exit keypad to restore | exit god-mode to restore |
+| **Dependencies** | none | evil (can be used standalone) | none |
+| **which-key** | optional module `keypad-which-key` | deep integration | not applicable |
+| **Prefix args** | not supported | `u`→C-u, `-`→M--, digits | `u`→C-u, digits |
+| **Learning curve** | moderate (prefix/modifier/fallback/toggle) | low (fixed rules, intuitive) | low (all letters gain Ctrl) |
+| **Maturity** | 0.2.0 | 36 commits | 955 stars, established |
+
