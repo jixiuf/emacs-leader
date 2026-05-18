@@ -163,7 +163,8 @@ modifier-prefix contexts.  Respects `which-key-idle-delay`, supports C-h n/p.
 (require 'keypad)
 (require 'keypad-which-key)
 
-(setq keypad-pass-through-predicates '(minibufferp isearch-mode))
+(add-to-list 'keypad-pass-through-predicates
+             (lambda () (eq helixel--current-state 'insert)))
 
 (setq keypad-keys
   '((:key "<SPC>" :prefix "C-c" :modifier "" :fallback "C-"
